@@ -53,6 +53,20 @@ app.post("/api/signup", (req, res) => {
     .catch(err => res.json({ ok: false, error: err }));
 });
 
+app.post("/api/signin", (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email, password })
+    .then(user => {
+      if (user) {
+        res.json({ ok: true, msg: "Signed in!" });
+      } else {
+        res.json({ ok: false, msg: "User not found!" });
+      }
+    })
+    .catch(err => res.json({ ok: false, error: err }));
+});
+
 app.get("/api/products", (req, res) => {
   Product.find({})
     .then(products => res.json({ ok: true, products }))
@@ -77,6 +91,15 @@ app.post("/api/signin", (req, res) => {
     .catch(() => res.json({ ok: false, msg: "Server error" }));
 });
 
+app.get("/api/all", (req, res) => {
+  if (req.query.admin !== "true") {
+    return res.status(400).json({ ok: false, msg: "Access denied" });
+  }
+
+  Order.find({})
+    .then((orders) => res.json({ ok: true, orders }))
+    .catch((err) => res.json({ ok: false, error: err }));
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
